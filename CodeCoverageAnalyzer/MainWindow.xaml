@@ -5,15 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CoverageAnalyzer" d:DataContext="{d:DesignInstance Type=local:CodeCoverage}"
         mc:Ignorable="d"
-        Title="Code Coverage Analyzer - By Partha" Height="500" Width="900">
+        Title="{Binding AppTitle}"
+        Height="500" Width="900">
 
     <Window.Resources>
         <Style TargetType="TreeViewItem">
             <Setter Property="FontFamily" Value="Consolas"/>
-            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="FontSize" Value="12"/>
         </Style>
     </Window.Resources>
-    <!-- Menu -->
+    <!-- Main Layout -->
     <DockPanel>
         <!-- Menu -->
         <Menu DockPanel.Dock="Top">
@@ -26,66 +27,56 @@
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/>
-                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="7*"/>
             </Grid.ColumnDefinitions>
 
             <!-- Left Frame -->
-            <Border Grid.Column="0" BorderBrush="Black" BorderThickness="2 2 0 2">
+            <Border Grid.Column="0" BorderBrush="Black" BorderThickness="4 4 4 4">
                 <TreeView Name="treeView" Margin="1" MouseDoubleClick="OnMouseDoubleClickOnTreeViewNode"
                           Background="LightGray"/>
             </Border>
 
-            <!-- GridSplitter for resizable border -->
-            <GridSplitter Grid.Column="1" Width="2" Background="Black" HorizontalAlignment="Stretch"/>
-
             <!-- Right Frame -->
-            <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0 2 2 2">
+            <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0 4 4 4">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
 
                     <!-- Top of Right Frame -->
-                    <!-- Top of Right Frame -->
-                    <!-- Fixed Header Row -->
-                    <!-- Fixed Header Row -->
                     <Border Background="LightGray" Padding="5">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="30"/>
-                                <ColumnDefinition Width="30"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" FontFamily="Consolas" FontSize="12" FontWeight="Bold" Text="Hits" HorizontalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" FontFamily="Consolas" FontSize="12" FontWeight="Bold" Text="Line" HorizontalAlignment="Center"/>
-                            <TextBlock Grid.Column="2" FontFamily="Consolas" FontSize="12" FontWeight="Bold" Text="Content" HorizontalAlignment="Center"/>
-                        </Grid>
+                        <!-- Placeholder for additional content or fixed header -->
                     </Border>
                     <FlowDocumentScrollViewer Grid.Row="0" Grid.Column="0" x:Name="flowDocumentScrollViewer" Margin="5" 
                                               VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                                               VerticalScrollBarVisibility="Auto" 
-                                              Document="{Binding CodeCover.FlowDoc, Mode=OneWay}"
-                                              >
+                                              Document="{Binding CodeCover.FlowDoc, Mode=OneWay}">
                     </FlowDocumentScrollViewer>
 
+                    <Border Grid.Row="1" Background="LightGray" Padding="5" BorderBrush="Black" 
+                            BorderThickness="0 4 0 0">
+                        <!-- Placeholder for additional content or fixed header -->
+                    
                     <!-- Bottom of Right Frame -->
-                    <DockPanel Grid.Row="1">
+                    <DockPanel Grid.Row="1" Margin="0" Background="LightGray">
                         <!-- Recompute Button -->
-                        <Button Content="Recompute" DockPanel.Dock="Left" Margin="5" VerticalAlignment="Bottom" Click="OnRecomputeClick">
-                            <Button.Style>
+                        <Button Content="Recompute" DockPanel.Dock="Left" Margin="1" 
+                                VerticalAlignment="Bottom" Click="OnRecomputeClick" Height="25">
+                                <Button.Style>
                                 <Style TargetType="Button">
                                     <Setter Property="Effect">
                                         <Setter.Value>
-                                            <DropShadowEffect Color="Black" ShadowDepth="0" Opacity="0" />
+                                            <DropShadowEffect Color="Black" ShadowDepth="5" 
+                                                              Opacity="0" />
                                         </Setter.Value>
                                     </Setter>
                                     <Style.Triggers>
                                         <Trigger Property="IsPressed" Value="True">
                                             <Setter Property="Effect">
                                                 <Setter.Value>
-                                                    <DropShadowEffect Color="Black" ShadowDepth="5" Opacity="0.5" />
+                                                    <DropShadowEffect Color="Black" ShadowDepth="5" 
+                                                                      Opacity="0.5" />
                                                 </Setter.Value>
                                             </Setter>
                                         </Trigger>
@@ -95,9 +86,10 @@
                         </Button>
 
                         <!-- Non-editable TextBox -->
-                        <TextBox Margin="5" VerticalAlignment="Bottom" IsReadOnly="True" 
+                        <TextBox Margin="5" VerticalAlignment="Bottom" IsReadOnly="True"  
                                  Text="{Binding LoadedSrcFullFilePath, Mode=OneWay}"/>
                     </DockPanel>
+                    </Border>
                 </Grid>
             </Border>
         </Grid>
