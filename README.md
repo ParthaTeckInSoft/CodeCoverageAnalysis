@@ -31,10 +31,10 @@ __The content of the xml be like__
         </function>
         </functions>
       <source_files>
-        <source_file id="0" path="C:\Users\Parthasarathy.LAP-TK01\MyProjects\CoverletSample\CodeCoverageAnalyze\src\CodeCoverageAnalyze\Class1.cs" checksum_type="SHA256" checksum="38F6E43B42960361CA6689953C19C27A21FFFB71074A59D07FD944FE3A42F719" />
-        <source_file id="1" path="C:\Users\Parthasarathy.LAP-TK01\MyProjects\CoverletSample\CodeCoverageAnalyze\src\CodeCoverageAnalyze\Program.cs" checksum_type="SHA256" checksum="6D13079EFDB43D0D613E5619C9ACF54688230245C5ECB1891C005B2621956FEB" />
-        <source_file id="2" path="C:\Users\Parthasarathy.LAP-TK01\MyProjects\CoverletSample\CodeCoverageAnalyze\src\CodeCoverageAnalyze\MultFolder\Multiply.cs" checksum_type="SHA256" checksum="81863AA921AFF647DAE33E3C2747617B0C1E60C1610D7332056003390AD69F27" />
-        <source_file id="3" path="C:\Users\Parthasarathy.LAP-TK01\MyProjects\CoverletSample\CodeCoverageAnalyze\src\CodeCoverageAnalyze\AdditionsFolder\Additions.cs" checksum_type="SHA256" checksum="3D7D89B4333D7C42CD19832EC2484B7235E227DB92B23B415BA0AAF8E21E684E" />
+        <source_file id="0" path="C:\Users\CodeCoverageAnalyze\src\CodeCoverageAnalyze\Class1.cs" checksum_type="SHA256" checksum="38F6E43B42960361CA6689953C19C27A21FFFB71074A59D07FD944FE3A42F719" />
+        <source_file id="1" path="C:\Users\CodeCoverageAnalyze\src\CodeCoverageAnalyze\Program.cs" checksum_type="SHA256" checksum="6D13079EFDB43D0D613E5619C9ACF54688230245C5ECB1891C005B2621956FEB" />
+        <source_file id="2" path="C:\Users\CodeCoverageAnalyze\src\CodeCoverageAnalyze\MultFolder\Multiply.cs" checksum_type="SHA256" checksum="81863AA921AFF647DAE33E3C2747617B0C1E60C1610D7332056003390AD69F27" />
+        <source_file id="3" path="C:\Users\odeCoverageAnalyze\src\CodeCoverageAnalyze\AdditionsFolder\Additions.cs" checksum_type="SHA256" checksum="3D7D89B4333D7C42CD19832EC2484B7235E227DB92B23B415BA0AAF8E21E684E" />
       </source_files>
       <skipped_functions />
     </module>
