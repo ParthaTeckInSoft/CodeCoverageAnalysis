@@ -152,7 +152,7 @@ public class CodeCoverage : INotifyPropertyChanged {
       for (int ii = 0; ii < fileLines.Length; ii++) {
          string line = fileLines[ii];
          List<Range>? ranges = GetAllRanges (filePath, ii + 1);
-         HighlightLine (flowDocument, line, ranges??(new List<Range>()));
+         HighlightLine (flowDocument, line, ranges??(new List<Range>()), ii+1);
       }
       FlowDoc = flowDocument; 
       OnPropertyChanged (nameof (FlowDoc));
@@ -164,47 +164,71 @@ public class CodeCoverage : INotifyPropertyChanged {
    /// <param name="flowDocument"></param>
    /// <param name="line"></param>
    /// <param name="ranges"></param>
-   void HighlightLine (FlowDocument flowDocument, string line, List<Range> ranges) {
-      Paragraph paragraph = new Paragraph (new Run (line)) {
-         Margin = new Thickness (0),  
-         LineHeight = 12             
+   void HighlightLine (FlowDocument flowDocument, string line, List<Range> ranges, int lineNumber) {
+      // Format the line number (e.g., 1, 2, 3...)
+      string lineNumberText = $"{lineNumber:D4}\t: "; // D4 formats the number to 4 digits (e.g., 0001, 0002)
+
+      // Create the paragraph with the line number
+      Paragraph paragraph = new Paragraph () {
+         Margin = new Thickness (0),
+         LineHeight = 12
       };
+
+      // Add the line number with a different style if needed
+      paragraph.Inlines.Add (new Run (lineNumberText) {
+         Foreground = Brushes.Black, // Line numbers in gray color for differentiation
+         FontWeight = FontWeights.Bold
+      });
+
       if (ranges == null || !ranges.Any ()) {
-         paragraph.Inlines.Clear ();
+         // If no ranges are provided, just add the line text with line number
          paragraph.Inlines.Add (new Run (line));
       } else {
-         paragraph.Inlines.Clear ();
          int prevEndColumn = 0;
-         ranges.OrderBy (rng => rng.StartColumn).ToList ();
+         ranges = ranges.OrderBy (rng => rng.StartColumn).ToList ();
+
          foreach (Range range in ranges) {
-            int highlightStartColumn = range.StartColumn; highlightStartColumn--;
-            int highlightEndColumn = range.EndColumn; highlightEndColumn--;
+            int highlightStartColumn = range.StartColumn - 1; // Adjust for 0-based index
+            int highlightEndColumn = range.EndColumn - 1; // Adjust for 0-based index
+
             if (prevEndColumn > highlightEndColumn) continue;
+
             bool isCovered = range.IsCovered;
+
             if (highlightStartColumn < 0) {
+               // If start column is invalid, clear and just add the line
                paragraph.Inlines.Clear ();
                paragraph.Inlines.Add (new Run (line));
+               return;
             } else if (line.Length >= highlightEndColumn) {
-               string beforeHighlight = line.Substring (prevEndColumn, highlightStartColumn-prevEndColumn);
-               string highlightedText = line.Substring (highlightStartColumn, highlightEndColumn- highlightStartColumn);
+               // Before highlighting
+               string beforeHighlight = line.Substring (prevEndColumn, highlightStartColumn - prevEndColumn);
+
+               // Highlighted text
+               string highlightedText = line.Substring (highlightStartColumn, highlightEndColumn - highlightStartColumn);
                prevEndColumn = highlightEndColumn;
-               //string afterHighlight = line.Substring (highlightEndColumn+1);
-               Color backgroundColor;
-               if (isCovered) backgroundColor = Color.FromRgb (0, 165, 240); // Light green background
-               else backgroundColor = Color.FromRgb (255, 165, 0); // Light red background
+
+               // Choose background color based on coverage
+               Color backgroundColor = isCovered ? Color.FromRgb (0, 165, 240) : Color.FromRgb (255, 165, 0);
+
+               // Add text segments to the paragraph
                paragraph.Inlines.Add (new Run (beforeHighlight));
                paragraph.Inlines.Add (new Run (highlightedText) {
                   Background = new SolidColorBrush (backgroundColor)
                });
             }
          }
+
+         // Add remaining text after the last highlight
          string afterHighlight = line.Substring (prevEndColumn);
          paragraph.Inlines.Add (new Run (afterHighlight));
       }
+
       // Add the paragraph to the FlowDocument
       flowDocument.Blocks.Add (paragraph);
    }
-   
+
+
    /// <summary>
    /// This method loads the coverage.xml document to memory
    /// </summary>
