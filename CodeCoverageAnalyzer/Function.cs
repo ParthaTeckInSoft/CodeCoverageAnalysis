@@ -11,7 +11,7 @@ namespace CoverageAnalyzer;
 /// CodeCoverage class aggregates the list of functions</summary>
 public struct Function {
    #region Constructor
-   public Function ( int funId, string funcName, string nspace, string cName, double blkCvrg, double lnCvrg,
+   public Function (int funId, string funcName, string nspace, string cName, double blkCvrg, double lnCvrg,
       int blkCovered, int blksNotCovered, int linesCovered, int linesPrtllyCovered, int linesNotCovered) {
       FunctionId = funId; FunctionName = funcName; Namespace = nspace; Classname = cName;
       BlockCoverage = blkCvrg; LineCoverage = lnCvrg; BlocksCovered = blkCovered; BlocksNotCovered = blksNotCovered;
@@ -20,18 +20,18 @@ public struct Function {
    #endregion
 
    #region Properties
-   public int SourceId {  get; set; }
+   public int SourceId { get; set; }
    public int FunctionId { get; set; }
    public string FunctionName { get; set; }
    public string Namespace { get; set; }
-   public string Classname {  get; set; }
-   public double BlockCoverage {  get; set; }
-   public double LineCoverage {  get; set; }
-   public int BlocksCovered {  get; set; }
-   public int BlocksNotCovered {  get; set; }
+   public string Classname { get; set; }
+   public double BlockCoverage { get; set; }
+   public double LineCoverage { get; set; }
+   public int BlocksCovered { get; set; }
+   public int BlocksNotCovered { get; set; }
    public int LinesCovered { get; set; }
-   public int LinesPartiallyCovered {  get; set; }
-   public int LinesNotCovered {  get; set; }
+   public int LinesPartiallyCovered { get; set; }
+   public int LinesNotCovered { get; set; }
    #endregion
 }
 

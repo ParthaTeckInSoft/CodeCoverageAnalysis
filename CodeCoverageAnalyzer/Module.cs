@@ -14,8 +14,8 @@ public struct Module {
    #region Constructor
    public Module (string moduleId, string moduleName, string modulePath, double blkCvrg, double lnCvrg,
       int blkCovered, int blksNotCovered, int linesCovered, int linesPrtllyCovered, int linesNotCovered) {
-      Id = moduleId; Name = moduleName; Path = modulePath; BlockCoverage = blkCvrg; LineCoverage = lnCvrg; BlocksCovered = blkCovered; 
-      BlocksNotCovered = blksNotCovered; LinesCovered = linesCovered; LinesPartiallyCovered = linesPrtllyCovered; 
+      Id = moduleId; Name = moduleName; Path = modulePath; BlockCoverage = blkCvrg; LineCoverage = lnCvrg; BlocksCovered = blkCovered;
+      BlocksNotCovered = blksNotCovered; LinesCovered = linesCovered; LinesPartiallyCovered = linesPrtllyCovered;
       LinesNotCovered = linesNotCovered;
    }
    #endregion

@@ -23,39 +23,35 @@ public class CodeCoverage : INotifyPropertyChanged {
 
    #region Properties and specific setters and getters
    List<Range>? mRanges;
-   public List<Range>? Ranges {
-      get => mRanges ??= new List<Range> ();
-   }
+   public List<Range>? Ranges { get => mRanges ??= new List<Range> (); }
    public void AddRange (int sourceId, int startLine, int endLine, int startColumn, int endColumn, bool isCovered) {
-      var index = mRanges?.FindIndex (it => (it.SourceId == sourceId && it.StartLine == startLine && 
+      var index = mRanges?.FindIndex (it => (it.SourceId == sourceId && it.StartLine == startLine &&
       it.EndLine == endLine && it.StartColumn == startColumn && it.EndColumn == endColumn && it.IsCovered == isCovered));
       if (index < 0) mRanges?.Add (new Range (sourceId, startLine, endLine, startColumn, endColumn, isCovered));
    }
 
    List<Tuple<int, string>>? mSrcFiles;
-   public List<Tuple<int, string>>? SrcFiles {
-      get => mSrcFiles ??= new List<Tuple<int, string>> ();
-   }
+   public List<Tuple<int, string>>? SrcFiles { get => mSrcFiles ??= new List<Tuple<int, string>> (); }
    public void AddSrcFile (int sId, string srcFilename) {
       var index = mSrcFiles?.FindIndex (it => it.Item1 == sId && it.Item2 == srcFilename);
       if (index < 0) mSrcFiles?.Add (new Tuple<int, string> (sId, srcFilename));
    }
-   public Tuple<int,int> GetBlocksCoverageInfo(string filepath) {
+
+   public Tuple<int, int> GetBlocksCoverageInfo (string filepath) {
       int? index = mSrcFiles?.FindIndex (it => it.Item2 == filepath);
       int blocksCovered = 0, blocksNotCovered = 0;
-      if (index .HasValue && index >= 0 ) {
-         var functions = mFunctions?.Where( fun => fun.SourceId == index.Value ).ToList ();
-         foreach( var fun in functions??new List<Function>()) {
+      if (index.HasValue && index >= 0) {
+         var functions = mFunctions?.Where (fun => fun.SourceId == index.Value).ToList ();
+         foreach (var fun in functions ?? new List<Function> ()) {
             blocksCovered += fun.BlocksCovered;
             blocksNotCovered += fun.BlocksNotCovered;
          }
       }
-      return new Tuple<int,int> (blocksCovered, blocksNotCovered);
+      return new Tuple<int, int> (blocksCovered, blocksNotCovered);
    }
+
    List<Module>? mModules;
-   public List<Module>? Modules {
-      get => mModules ??= new List<Module> ();
-   }
+   public List<Module>? Modules { get => mModules ??= new List<Module> (); }
    public void AddModule (string moduleId, string moduleName, string modulePath, double blkCvrg, double lnCvrg,
       int blkCovered, int blksNotCovered, int linesCovered, int linesPrtllyCovered, int linesNotCovered) {
       var index = mModules?.FindIndex (it => it.Id == moduleId && it.Name == moduleName && it.Path == modulePath &&
@@ -66,9 +62,7 @@ public class CodeCoverage : INotifyPropertyChanged {
    }
 
    List<Function>? mFunctions;
-   public List<Function>? Functions {
-      get => mFunctions ??= new List<Function> ();
-   }
+   public List<Function>? Functions { get => mFunctions ??= new List<Function> (); }
    public void SetSourceIdToLastFunction (int sId) {
       Function func;
       if (mFunctions != null) {
@@ -77,6 +71,7 @@ public class CodeCoverage : INotifyPropertyChanged {
          mFunctions[^1] = func;
       }
    }
+
    public void AddFunction (int functionId, string funName, string nspace, string classname, double blockCvrg,
       double lineCvrg, int blocksCvrd, int blocksNotCvrd, int linesCvrd,
       int linesPartiallyCvrd, int linesNotCvrd) {
@@ -87,26 +82,26 @@ public class CodeCoverage : INotifyPropertyChanged {
       if (index < 0) mFunctions?.Add (new Function (functionId, funName, nspace, classname, blockCvrg, lineCvrg, blocksCvrd,
          blocksNotCvrd, linesCvrd, linesPartiallyCvrd, linesNotCvrd));
    }
-   int GetSourceId(string fullFilePath) {
+
+   int GetSourceId (string fullFilePath) {
       var srcFileEntry = mSrcFiles?.FirstOrDefault (it => it.Item2 == fullFilePath);
       if (srcFileEntry != null) return srcFileEntry.Item1;
       else return -1;
    }
-   Range? GetRangeEntry(string fullFilePath, int lineNo) {
-      var range = mRanges?.FirstOrDefault(it=>it.SourceId == GetSourceId(fullFilePath) && it.StartLine == lineNo);
+
+   Range? GetRangeEntry (string fullFilePath, int lineNo) {
+      var range = mRanges?.FirstOrDefault (it => it.SourceId == GetSourceId (fullFilePath) && it.StartLine == lineNo);
       // Check if the range is the default value for the Range struct
-      if (range.Equals (default (Range)) && range?.StartLine == 0) // Confirming no default matching range
-      {
-         // Return null if the default value is found (indicating no match)
-         return null;
-      }
+      if (range.Equals (default (Range)) && range?.StartLine == 0) return null;
       return range;
    }
+
    List<Range>? GetAllRanges (string fullFilePath, int lineNo) {
-      var ranges = mRanges?.Where (it => it.SourceId == GetSourceId (fullFilePath) && it.StartLine == lineNo).ToList();
-      return ranges?? new List<Range>();
-      
+      var ranges = mRanges?.Where (it => it.SourceId == GetSourceId (fullFilePath) && it.StartLine == lineNo).ToList ();
+      return ranges ?? new List<Range> ();
+
    }
+
    FlowDocument mFlowDoc;
    public FlowDocument FlowDoc {
       get => mFlowDoc;
@@ -117,7 +112,7 @@ public class CodeCoverage : INotifyPropertyChanged {
    }
 
    public int TotalBlocks { get; set; }
-   public int BlocksCovered {  get; set; }
+   public int BlocksCovered { get; set; }
    #endregion
 
    #region Clearances
@@ -149,12 +144,15 @@ public class CodeCoverage : INotifyPropertyChanged {
          FontSize = 12
       };
       string[] fileLines = File.ReadAllLines (filePath);
+      int lineNumber = -1;
       for (int ii = 0; ii < fileLines.Length; ii++) {
          string line = fileLines[ii];
          List<Range>? ranges = GetAllRanges (filePath, ii + 1);
-         HighlightLine (flowDocument, line, ranges??(new List<Range>()), ii+1);
+         if (ii + 1 <= lineNumber) continue;
+         lineNumber = ii + 1;
+         HighlightLine (flowDocument, fileLines, ranges ?? (new List<Range> ()), ref lineNumber);
       }
-      FlowDoc = flowDocument; 
+      FlowDoc = flowDocument;
       OnPropertyChanged (nameof (FlowDoc));
    }
 
@@ -164,7 +162,8 @@ public class CodeCoverage : INotifyPropertyChanged {
    /// <param name="flowDocument"></param>
    /// <param name="line"></param>
    /// <param name="ranges"></param>
-   void HighlightLine (FlowDocument flowDocument, string line, List<Range> ranges, int lineNumber) {
+   void HighlightLine (FlowDocument flowDocument, string[] fileLines, List<Range> ranges,
+      ref int lineNumber) {
       // Format the line number (e.g., 1, 2, 3...)
       string lineNumberText = $"{lineNumber:D4}\t: "; // D4 formats the number to 4 digits (e.g., 0001, 0002)
 
@@ -180,54 +179,85 @@ public class CodeCoverage : INotifyPropertyChanged {
          FontWeight = FontWeights.Bold
       });
 
-      if (ranges == null || !ranges.Any ()) {
-         // If no ranges are provided, just add the line text with line number
-         paragraph.Inlines.Add (new Run (line));
-      } else {
+      if (ranges == null || !ranges.Any ()) paragraph.Inlines.Add (new Run (fileLines[lineNumber - 1]));
+      else {
          int prevEndColumn = 0;
          ranges = ranges.OrderBy (rng => rng.StartColumn).ToList ();
-
+         string afterHighlight;
+         List<string> lineBlock = new List<string> ();
          foreach (Range range in ranges) {
+            lineBlock.Clear ();
             int highlightStartColumn = range.StartColumn - 1; // Adjust for 0-based index
             int highlightEndColumn = range.EndColumn - 1; // Adjust for 0-based index
-
+            for (int jj = range.StartLine - 1; jj <= range.EndLine - 1; jj++) lineBlock.Add (fileLines[jj]);
             if (prevEndColumn > highlightEndColumn) continue;
-
-            bool isCovered = range.IsCovered;
-
             if (highlightStartColumn < 0) {
                // If start column is invalid, clear and just add the line
                paragraph.Inlines.Clear ();
-               paragraph.Inlines.Add (new Run (line));
+               lineBlock.ForEach (line => paragraph.Inlines.Add (new Run (line)));
                return;
-            } else if (line.Length >= highlightEndColumn) {
-               // Before highlighting
-               string beforeHighlight = line.Substring (prevEndColumn, highlightStartColumn - prevEndColumn);
+            }
 
-               // Highlighted text
-               string highlightedText = line.Substring (highlightStartColumn, highlightEndColumn - highlightStartColumn);
-               prevEndColumn = highlightEndColumn;
+            // Choose background color based on coverage
+            Color backgroundColor = range.IsCovered ? Color.FromRgb (0, 165, 240) : Color.FromRgb (255, 165, 0);
 
-               // Choose background color based on coverage
-               Color backgroundColor = isCovered ? Color.FromRgb (0, 165, 240) : Color.FromRgb (255, 165, 0);
-
-               // Add text segments to the paragraph
-               paragraph.Inlines.Add (new Run (beforeHighlight));
-               paragraph.Inlines.Add (new Run (highlightedText) {
-                  Background = new SolidColorBrush (backgroundColor)
-               });
+            for (int ii = 0; ii < lineBlock.Count; ii++) {
+               var line = lineBlock[ii];
+               // Range with same line, different columns
+               if (lineBlock.Count == 1 && line.Length >= highlightEndColumn) {
+                  string beforeHighlight = line.Substring (prevEndColumn, highlightStartColumn - prevEndColumn);
+                  string highlightedText = line.Substring (highlightStartColumn, highlightEndColumn - highlightStartColumn);
+                  prevEndColumn = highlightEndColumn;
+                  paragraph.Inlines.Add (new Run (beforeHighlight));
+                  paragraph.Inlines.Add (new Run (highlightedText) {
+                     Background = new SolidColorBrush (backgroundColor)
+                  });
+               } else { // Range with multiple lines and multiple columns
+                  string beforeHighlight;
+                  if (ii == 0) {
+                     beforeHighlight = line.Substring (0, highlightStartColumn);
+                     paragraph.Inlines.Add (new Run (beforeHighlight));
+                     string highlightedText = line.Substring (highlightStartColumn);
+                     paragraph.Inlines.Add (new Run (highlightedText) {
+                        Background = new SolidColorBrush (backgroundColor)
+                     });
+                     paragraph.Inlines.Add (new LineBreak ());
+                  } else if (ii == lineBlock.Count - 1) {
+                     lineNumberText = $"{++lineNumber:D4}\t: ";
+                     paragraph.Inlines.Add (new Run (lineNumberText) {
+                        Foreground = Brushes.Black,
+                        FontWeight = FontWeights.Bold
+                     });
+                     string highlightedText = line.Substring (0, highlightEndColumn);
+                     paragraph.Inlines.Add (new Run (highlightedText) {
+                        Background = new SolidColorBrush (backgroundColor)
+                     });
+                     afterHighlight = line.Substring (highlightEndColumn);
+                     paragraph.Inlines.Add (new Run (afterHighlight));
+                  } else {
+                     lineNumberText = $"{++lineNumber:D4}\t: ";
+                     paragraph.Inlines.Add (new Run (lineNumberText) {
+                        Foreground = Brushes.Black,
+                        FontWeight = FontWeights.Bold
+                     });
+                     paragraph.Inlines.Add (new Run (line) {
+                        Background = new SolidColorBrush (backgroundColor)
+                     });
+                     paragraph.Inlines.Add (new LineBreak ());
+                  }
+               }
             }
          }
-
-         // Add remaining text after the last highlight
-         string afterHighlight = line.Substring (prevEndColumn);
-         paragraph.Inlines.Add (new Run (afterHighlight));
+         if (lineBlock.Count == 1) {
+            // Add remaining text after the last highlight
+            afterHighlight = lineBlock[0].Substring (prevEndColumn);
+            paragraph.Inlines.Add (new Run (afterHighlight));
+         }
       }
 
       // Add the paragraph to the FlowDocument
       flowDocument.Blocks.Add (paragraph);
    }
-
 
    /// <summary>
    /// This method loads the coverage.xml document to memory
@@ -237,7 +267,6 @@ public class CodeCoverage : INotifyPropertyChanged {
    /// dobument misses the required elements or attributes</exception>
    public void LoadXMLDocument (string xmlFilename) {
       ClearAll ();
-
       // Read and process the XML file
       XmlDocument coverageXmlDoc = new XmlDocument ();
       coverageXmlDoc.Load (xmlFilename);
@@ -245,7 +274,6 @@ public class CodeCoverage : INotifyPropertyChanged {
       XmlElement? xmlRoot = coverageXmlDoc.DocumentElement;
       if (xmlRoot == null) return;
       FlowDocument flowdoc = new FlowDocument ();
-      //string[] srcFileNames = [];
 
       // Read all <Module> information
       XmlNodeList? moduleNodes = coverageXmlDoc.SelectNodes ("//modules/module");
@@ -284,7 +312,6 @@ public class CodeCoverage : INotifyPropertyChanged {
          int linesNotCovered = int.Parse (linesNotCoveredAttr.InnerText);
          this.AddModule (modId, modName, modPath, blkCoverage, lineCoverage, blocksCovered,
             blocksNotCovered, linesCovered, linesPartiallyCovered, linesNotCovered);
-
 
          // Get all <source> elements
          XmlNode? sourceFilesNode = moduleNode?.SelectSingleNode ("source_files");
@@ -381,7 +408,7 @@ public class CodeCoverage : INotifyPropertyChanged {
       }
 
       // Compute total blocks, blocks covered
-      foreach( var module in Modules??new List<Module> ()) {
+      foreach (var module in Modules ?? new List<Module> ()) {
          TotalBlocks += module.BlocksCovered + module.BlocksNotCovered;
          BlocksCovered += module.BlocksCovered;
       }

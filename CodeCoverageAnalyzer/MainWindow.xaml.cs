@@ -39,7 +39,7 @@ namespace CoverageAnalyzer {
       }
       string mAppTitle;
       public string AppTitle {
-         get => mAppTitle; 
+         get => mAppTitle;
          set {
             if (mAppTitle != value)
                mAppTitle = value;
@@ -112,7 +112,7 @@ namespace CoverageAnalyzer {
       /// which is output from dotnet-coverage tool
       /// </summary>
       /// <param name="xmlFilename">The full file path name of the coverage.cobertura.xml</param>
-      
+
       #endregion
 
       #region Attached Properties
@@ -178,13 +178,14 @@ namespace CoverageAnalyzer {
             if (string.IsNullOrEmpty (xmlFilename))
                return;
             try {
-               if (CodeCover != null ) CodeCover.LoadXMLDocument (xmlFilename);
+               if (CodeCover != null) CodeCover.LoadXMLDocument (xmlFilename);
+               ClearView ();
                CreateTreeView ();
                double percent = 0.0;
                int? blocksCovered = 0;
                int? totalBlocks = 0;
-               if (CodeCover != null ) {
-                  if ( CodeCover?.BlocksCovered != null && CodeCover?.TotalBlocks != null) {
+               if (CodeCover != null) {
+                  if (CodeCover?.BlocksCovered != null && CodeCover?.TotalBlocks != null) {
                      blocksCovered = CodeCover?.BlocksCovered;
                      totalBlocks = CodeCover?.TotalBlocks;
                      if (blocksCovered != null && totalBlocks != null) {
@@ -213,10 +214,10 @@ namespace CoverageAnalyzer {
       void CreateTreeView () {
          treeView.Items.Clear ();
          if (CodeCover == null) return;
-         if ( CodeCover.SrcFiles == null) return;
+         if (CodeCover.SrcFiles == null) return;
          // Create the folder view of the source files.
-         foreach( var srcFileData in CodeCover.SrcFiles) {
-            if ( srcFileData == null ) continue;
+         foreach (var srcFileData in CodeCover.SrcFiles) {
+            if (srcFileData == null) continue;
             var (id, fullFilePath) = srcFileData;
             TreeViewItem? parentNode = AddPathToTreeView (treeView, fullFilePath);
             if (parentNode == null) throw new Exception ("Creation of path nodes failed");
@@ -250,18 +251,13 @@ namespace CoverageAnalyzer {
             int totalBlocks = blocksCoveredThisFile + blocksNotCoveredThisFile;
             double percent = ((double)blocksCoveredThisFile / totalBlocks) * 100.0;
             percent = Math.Round (percent, 2);
-            string fileCvrgInfo = string.Format ("{0} : {1} / {2} : blocks : {3} %", filePath,
+            string fileCvrgInfo = string.Format ("{0} : {1} / {2} : blocks  {3} %", filePath,
                blocksCoveredThisFile, totalBlocks,
-               (totalBlocks) > 0 ? percent : 0.0);;
+               (totalBlocks) > 0 ? percent : 0.0); ;
             LoadedSrcFullFilePath = fileCvrgInfo;
          }
       }
-      private void OnFileCloseClick (object sender, RoutedEventArgs e) {
-         treeView.Items.Clear ();
-         if (CodeCover != null) CodeCover.FlowDoc = new FlowDocument ();
-         LoadedSrcFullFilePath = "";
-         AppTitle = mTitle;
-      }
+      private void OnFileCloseClick (object sender, RoutedEventArgs e) => ClearView ();
 
       private void OnRecomputeClick (object sender, RoutedEventArgs e) {
 
@@ -281,6 +277,13 @@ namespace CoverageAnalyzer {
             current = VisualTreeHelper.GetParent (current);
          }
          return null;
+      }
+
+      void ClearView () {
+         treeView.Items.Clear ();
+         if (CodeCover != null) CodeCover.FlowDoc = new FlowDocument ();
+         LoadedSrcFullFilePath = "";
+         AppTitle = mTitle;
       }
       #endregion
    }
