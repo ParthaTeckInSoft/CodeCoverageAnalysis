@@ -37,7 +37,14 @@
             <!-- Left Frame -->
             <Border Grid.Column="0" BorderBrush="Black" BorderThickness="4 4 0 4">
                 <TreeView Name="treeView" Margin="1" MouseDoubleClick="OnMouseDoubleClickOnTreeViewNode"
-                          Background="LightGray"/>
+                          PreviewMouseRightButtonDown="OnRMBOnTreeviewNode"  Background="LightGray">
+                    <TreeView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Explode" Click="OnExplodeClick"/>
+                            <MenuItem Header="Collapse" Click="OnCollapseClick"/>
+                        </ContextMenu>
+                    </TreeView.ContextMenu>
+                </TreeView>
             </Border>
 
             <!-- GridSplitter -->
@@ -63,15 +70,14 @@
                                               Document="{Binding CodeCover.FlowDoc, Mode=OneWay}">
                     </FlowDocumentScrollViewer>
 
-                    <Border Grid.Row="1" Background="LightGray" Padding="5" BorderBrush="Black" 
+                    <Border Grid.Row="1" Background="LightGray" Padding="0" BorderBrush="Black" 
                             BorderThickness="0 4 0 0">
                         <!-- Placeholder for additional content or fixed header -->
 
                         <!-- Bottom of Right Frame -->
                         <DockPanel Grid.Row="1" Margin="0" Background="LightGray">
                             <!-- Recompute Button -->
-                            <Button Content="Recompute" DockPanel.Dock="Left" Margin="1" 
-                                VerticalAlignment="Bottom" Click="OnRecomputeClick" Height="25">
+                            <Button Content="Recompute" DockPanel.Dock="Left" Click="OnRecomputeClick" Height="25" Width="63">
                                 <Button.Style>
                                     <Style TargetType="Button">
                                         <Setter Property="Effect">
@@ -95,8 +101,8 @@
                             </Button>
 
                             <!-- Non-editable TextBox -->
-                            <TextBox Margin="5" VerticalAlignment="Bottom" IsReadOnly="True"  
-                                 Text="{Binding LoadedSrcFullFilePath, Mode=OneWay}"/>
+                            <TextBox Margin="4" IsReadOnly="True"
+                                 Text="{Binding LoadedSrcFullFilePath, Mode=OneWay}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Height="16"/>
                         </DockPanel>
                     </Border>
                 </Grid>

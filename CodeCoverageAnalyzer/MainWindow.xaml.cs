@@ -13,7 +13,7 @@ namespace CoverageAnalyzer {
    /// </summary>
    public partial class MainWindow : Window, INotifyPropertyChanged {
 
-      #region Constrcutor(s)
+      #region Constructor(s)
       public MainWindow () {
          InitializeComponent ();
          CodeCover = new CodeCoverage ();
@@ -58,63 +58,6 @@ namespace CoverageAnalyzer {
       }
       #endregion
 
-      #region XML loading methods(s)
-
-      // Method to find or add a node to the TreeView or a TreeViewItem's children
-      private static TreeViewItem AddOrGetNode (ItemsControl parent, string header) {
-         // Iterate through existing nodes to find the node with the matching header
-         foreach (var item in parent.Items) {
-            TreeViewItem? currentItem = item as TreeViewItem;
-            if (currentItem != null && string.Compare (currentItem.Header.ToString (), header, StringComparison.OrdinalIgnoreCase) == 0) {
-               // Node already exists, return it
-               return currentItem;
-            }
-         }
-
-         // Node does not exist, create and add a new node
-         TreeViewItem newNode = new TreeViewItem () { Header = header };
-         parent.Items.Add (newNode);
-         return newNode;
-      }
-
-      // Method to add nodes from a file path to a TreeView
-      public TreeViewItem? AddPathToTreeView (TreeView treeView, string path) {
-         // Get the directory path without the file name
-         string? directoryPath = Path.GetDirectoryName (path);
-         if (directoryPath == null) {
-            throw new ArgumentException ("Invalid path provided.", nameof (path));
-         }
-
-         // Split the directory path into segments
-         string[] pathSegments = directoryPath.Split (Path.DirectorySeparatorChar);
-
-         TreeViewItem? currentNode = null;
-         TreeViewItem? parentNode = null;
-
-         foreach (string segment in pathSegments) {
-            // If it's the first segment, we look in the root of the TreeView
-            if (currentNode == null) {
-               currentNode = AddOrGetNode (treeView, segment);
-            } else {
-               // For subsequent segments, we look in the children of the current node
-               currentNode = AddOrGetNode (currentNode, segment);
-            }
-            SetIsFile (currentNode, false);
-            // Update the parentNode reference to currentNode for the next iteration
-            parentNode = currentNode;
-         }
-
-         // Return the final node representing the directory containing the file
-         return parentNode;
-      }
-      /// <summary>
-      /// This method loads the code coverage result XML file, 
-      /// which is output from dotnet-coverage tool
-      /// </summary>
-      /// <param name="xmlFilename">The full file path name of the coverage.cobertura.xml</param>
-
-      #endregion
-
       #region Attached Properties
       public static readonly DependencyProperty IsFileProperty =
             DependencyProperty.RegisterAttached (
@@ -124,10 +67,22 @@ namespace CoverageAnalyzer {
                 new PropertyMetadata (false)
             );
 
+      /// <summary>
+      /// Method to query if the object has an attached property that 
+      /// contains the file path (string)
+      /// </summary>
+      /// <param name="obj"></param>
+      /// <returns></returns>
       public static bool GetIsFile (DependencyObject obj) {
          return (bool)obj.GetValue (IsFileProperty);
       }
 
+      /// <summary>
+      /// Method to set the object with attached property with 
+      /// boolean true is this node is a file (leaf) (string)
+      /// </summary>
+      /// <param name="obj"></param>
+      /// <param name="value"></param>
       public static void SetIsFile (DependencyObject obj, bool value) {
          obj.SetValue (IsFileProperty, value);
       }
@@ -141,10 +96,21 @@ namespace CoverageAnalyzer {
               new PropertyMetadata (string.Empty)
           );
 
+      /// <summary>
+      /// Method to get the treeview item with the full file path as
+      /// attached property (string)
+      /// </summary>
+      /// <param name="obj"></param>
+      /// <returns></returns>
       public static string GetFilePath (DependencyObject obj) {
          return (string)obj.GetValue (FilePathProperty);
       }
 
+      /// <summary>
+      /// Method to set the treeview item with the full file path as
+      /// attached property (string)</summary>
+      /// <param name="obj"></param>
+      /// <param name="value"></param>
       public static void SetFilePath (DependencyObject obj, string value) {
          obj.SetValue (FilePathProperty, value);
       }
@@ -166,7 +132,6 @@ namespace CoverageAnalyzer {
          OpenFileDialog openFileDialog = new OpenFileDialog {
             Filter = "XML files (*.xml)|*.xml|All files (*.*)|*.*",
             Title = "Open XML File",
-            InitialDirectory = @"C:\Users\Parthasarathy.LAP-TK01\MyProjects\CoverletSample\CodeCoverageAnalyze\src\CodeCoverageAnalyze\bin\Debug\net8.0"
          };
 
          // Show the dialog and get the result
@@ -211,24 +176,7 @@ namespace CoverageAnalyzer {
       /// by reading from the data from CodeCoverage data structure.
       /// </summary>
       /// <exception cref="Exception"></exception>
-      void CreateTreeView () {
-         treeView.Items.Clear ();
-         if (CodeCover == null) return;
-         if (CodeCover.SrcFiles == null) return;
-         // Create the folder view of the source files.
-         foreach (var srcFileData in CodeCover.SrcFiles) {
-            if (srcFileData == null) continue;
-            var (id, fullFilePath) = srcFileData;
-            TreeViewItem? parentNode = AddPathToTreeView (treeView, fullFilePath);
-            if (parentNode == null) throw new Exception ("Creation of path nodes failed");
-            string? srcFileName = System.IO.Path.GetFileName (fullFilePath);
-            if (string.IsNullOrEmpty (srcFileName)) throw new Exception ("Source file name is null or empty");
-            TreeViewItem? srcFileTreeViewItem = AddOrGetNode (parentNode, srcFileName);
-
-            SetIsFile (srcFileTreeViewItem, true);
-            SetFilePath (srcFileTreeViewItem, fullFilePath);
-         }
-      }
+      
       /// <summary>
       /// This callback method loads the source file corresponding to the coverage data
       /// into the FlowDocumentScrollViewer by calling CodeCoverage.LoadFileIntoDocumentViewer()
@@ -257,10 +205,50 @@ namespace CoverageAnalyzer {
             LoadedSrcFullFilePath = fileCvrgInfo;
          }
       }
+
+      /// <summary>
+      /// Callback method on the event of File menu "Close" is invoked
+      /// </summary>
+      /// <param name="sender"></param>
+      /// <param name="e"></param>
       private void OnFileCloseClick (object sender, RoutedEventArgs e) => ClearView ();
 
-      private void OnRecomputeClick (object sender, RoutedEventArgs e) {
+      private void OnRecomputeClick (object sender, RoutedEventArgs e) {}
 
+      /// <summary>
+      /// Callback method when RMB contextual menu "Explode" is invoked.
+      /// </summary>
+      /// <param name="sender"></param>
+      /// <param name="e"></param>
+      private void OnExplodeClick (object sender, RoutedEventArgs e) {
+         if (treeView.SelectedItem is TreeViewItem selectedItem)
+            ExplodeTree (selectedItem);
+      }
+
+      /// <summary>
+      /// Callback method when RMB contextual menu "Collapse" is invoked.
+      /// </summary>
+      /// <param name="sender"></param>
+      /// <param name="e"></param>
+      private void OnCollapseClick (object sender, RoutedEventArgs e) {
+         if (treeView.SelectedItem is TreeViewItem selectedItem) {
+            CollapseTree (selectedItem);
+         }
+      }
+
+      /// <summary>
+      /// Callback method to handle RMB selection of treeview node
+      /// </summary>
+      /// <param name="sender"></param>
+      /// <param name="e"></param>
+      private void OnRMBOnTreeviewNode (object sender, MouseButtonEventArgs e) {
+         if (e.OriginalSource is DependencyObject originalSource) {
+            var treeViewItem = FindAncestor<TreeViewItem> (originalSource);
+            if (treeViewItem != null) {
+               treeViewItem.IsSelected = true;
+               e.Handled = true;
+            }
+         }
       }
       #endregion
 
@@ -278,12 +266,108 @@ namespace CoverageAnalyzer {
          }
          return null;
       }
+      #endregion
 
+      #region Action Methods
+      /// <summary>
+      /// This method either adds a new node to the parent node with the given header
+      /// OR returns the existing node with the same name
+      /// </summary>
+      /// <param name="parent">Parent to which the new or existing node with HEADER</param>
+      /// <param name="header">Uniquely identifying the nodes by HEADER</param>
+      /// <returns></returns>
+      private static TreeViewItem AddOrGetNode (ItemsControl parent, string header) {
+         foreach (var item in parent.Items) {
+            TreeViewItem? currentItem = item as TreeViewItem;
+            if (currentItem != null &&
+               string.Compare (currentItem.Header.ToString (), header, StringComparison.OrdinalIgnoreCase) == 0)
+               return currentItem;
+         }
+         // Node does not exist, create and add a new node
+         TreeViewItem newNode = new TreeViewItem () { Header = header };
+         parent.Items.Add (newNode);
+         return newNode;
+      }
+
+      /// <summary>
+      /// This method adds the treeview node with folders and file name
+      /// provided in the full file path.
+      /// </summary>
+      /// <param name="treeView">The tree view which should be added with new nodes for folders/file</param>
+      /// <param name="path">The full file path</param>
+      /// <returns></returns>
+      /// <exception cref="ArgumentException"></exception>
+      public TreeViewItem? AddPathToTreeView (TreeView treeView, string path) {
+         string? directoryPath = Path.GetDirectoryName (path);
+         if (directoryPath == null) throw new ArgumentException ("Invalid path provided.", nameof (path));
+         string[] pathSegments = directoryPath.Split (Path.DirectorySeparatorChar);
+         TreeViewItem? currentNode = null;
+         TreeViewItem? parentNode = null;
+
+         foreach (string segment in pathSegments) {
+            if (currentNode == null) currentNode = AddOrGetNode (treeView, segment);
+            else currentNode = AddOrGetNode (currentNode, segment);
+            SetIsFile (currentNode, false);
+            parentNode = currentNode;
+         }
+         return parentNode;
+      }
+
+      /// <summary>
+      /// Method to clear all the views.
+      /// </summary>
       void ClearView () {
          treeView.Items.Clear ();
          if (CodeCover != null) CodeCover.FlowDoc = new FlowDocument ();
          LoadedSrcFullFilePath = "";
          AppTitle = mTitle;
+      }
+
+      /// <summary>
+      /// The main method which creates the tree view by calling the method 
+      /// AddPathToTreeView and AddOrGetNode. This also sets the attached properties 
+      /// to the treeview items.
+      /// </summary>
+      /// <exception cref="Exception">Throws exceptions if the input is inconsistent</exception>
+      void CreateTreeView () {
+         treeView.Items.Clear ();
+         if (CodeCover == null) return;
+         if (CodeCover.SrcFiles == null) return;
+         // Create the folder view of the source files.
+         foreach (var srcFileData in CodeCover.SrcFiles) {
+            if (srcFileData == null) continue;
+            var (id, fullFilePath) = srcFileData;
+            TreeViewItem? parentNode = AddPathToTreeView (treeView, fullFilePath);
+            if (parentNode == null) throw new Exception ("Creation of path nodes failed");
+            string? srcFileName = System.IO.Path.GetFileName (fullFilePath);
+            if (string.IsNullOrEmpty (srcFileName)) throw new Exception ("Source file name is null or empty");
+            TreeViewItem? srcFileTreeViewItem = AddOrGetNode (parentNode, srcFileName);
+
+            SetIsFile (srcFileTreeViewItem, true);
+            SetFilePath (srcFileTreeViewItem, fullFilePath);
+         }
+      }
+
+      /// <summary>
+      /// Method to Collapse the tree view
+      /// </summary>
+      /// <param name="treeViewItem"></param>
+      void CollapseTree (TreeViewItem treeViewItem) {
+         treeViewItem.IsExpanded = false;
+         foreach (var item in treeViewItem.Items) {
+            if (item is TreeViewItem childItem) CollapseTree (childItem);
+         }
+      }
+
+      /// <summary>
+      /// Method to expand tree view
+      /// </summary>
+      /// <param name="treeViewItem"></param>
+      void ExplodeTree (TreeViewItem treeViewItem) {
+         treeViewItem.IsExpanded = true;
+         foreach (var item in treeViewItem.Items) {
+            if (item is TreeViewItem childItem) ExplodeTree (childItem);
+         }
       }
       #endregion
    }
