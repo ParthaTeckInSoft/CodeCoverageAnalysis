@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CoverageAnalyzer;
+﻿namespace CoverageAnalyzer;
 
 /// <summary>
 /// This struct is a place holder of the XML element Range

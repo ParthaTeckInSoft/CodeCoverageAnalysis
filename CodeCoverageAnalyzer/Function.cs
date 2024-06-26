@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace CoverageAnalyzer;
+﻿namespace CoverageAnalyzer;
 
 /// <summary>
 /// This struct is a place holder of the XML element Function
