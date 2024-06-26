@@ -19,4 +19,3 @@ public struct Range (int sourceId, int startLine, int endLine, int startColumn, 
    public bool IsCovered { get; set; } = isCovered;
    #endregion
 }
-
