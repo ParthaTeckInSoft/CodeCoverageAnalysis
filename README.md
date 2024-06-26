@@ -5,9 +5,8 @@ __Steps to use this tool__
 * Build the tool using the solution file provided (inside the folder CodeCoverageAnalyzer)
 * Invoke the tool and open the XML file (coverage.xml)
 * Browse through the tree in the left side. 
-* "Double click - Invoke" and load the corresponding source file.
+* "click select- Invoke" and load the corresponding source file.
 * Close when done
-* Check the demo file  CodeCoverageAnalysisDisplay.mp4
 
 __The content of the xml be like__
 ```xml
