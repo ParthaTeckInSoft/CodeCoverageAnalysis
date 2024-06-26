@@ -95,7 +95,7 @@ namespace CoverageAnalyzer {
       /// <param name="e">The event data containing information about the routed event</param>
       void OnFileOpenClick (object sender, RoutedEventArgs e) {
          // Create an instance of OpenFileDialog
-         OpenFileDialog openFileDialog = new OpenFileDialog {
+         OpenFileDialog openFileDialog = new () {
             Filter = "XML files (*.xml)|*.xml|All files (*.*)|*.*",
             Title = "Open XML File",
          };
@@ -171,7 +171,7 @@ namespace CoverageAnalyzer {
       /// <returns></returns>
       T? FindAncestor<T> (DependencyObject current) where T : DependencyObject {
          while (current != null) {
-            if (current is T) return (T)current;
+            if (current is T t) return t;
             current = VisualTreeHelper.GetParent (current);
          }
          return null;
@@ -204,7 +204,7 @@ namespace CoverageAnalyzer {
             currentPath += parts[ii] + (ii < parts.Length - 1 ? @"\" : "");
 
             if (!mTreeNodeMap.ContainsKey (currentPath)) {
-               TreeViewItem newItem = new TreeViewItem { Header = parts[ii] };
+               TreeViewItem newItem = new () { Header = parts[ii] };
                mTreeNodeMap[currentPath] = new Tuple<TreeViewItem, bool> (newItem, ii == parts.Length - 1);
                if ( treeView.Items.Count == 0) treeView.Items.Add (newItem);
                newItem.Tag = currentPath;
@@ -230,8 +230,7 @@ namespace CoverageAnalyzer {
             var rootItemData = treeView.Items[0];
 
             // Retrieve the TreeViewItem for the root data item
-            var rootTreeViewItem = treeView.ItemContainerGenerator.ContainerFromItem (rootItemData) as TreeViewItem;
-            if (rootTreeViewItem != null) return rootTreeViewItem;            
+            if ( treeView.ItemContainerGenerator.ContainerFromItem (rootItemData) is TreeViewItem rootTreeViewItem ) return rootTreeViewItem;
          }
          return null; // Return null if no root item found
       }
@@ -302,7 +301,7 @@ namespace CoverageAnalyzer {
       /// <param name="sender">The source of the event, typically the TreeView control</param>
       /// <param name="e">The event data containing selected item</param>
       void OnTreeViewItemSelected (object sender, RoutedPropertyChangedEventArgs<object> e) {
-         if (e.OriginalSource is DependencyObject originalSource) {
+         if (e.OriginalSource is DependencyObject) {
 
             // Retrieve the selected treeview item node object
             var item = (TreeViewItem)e.NewValue;
@@ -322,8 +321,7 @@ namespace CoverageAnalyzer {
                LoadFileIntoDocumentViewer (filePath);
 
             // Get the blocks covered and not covered to display them
-            int blocksCoveredThisFile = 0, blocksNotCoveredThisFile = 0;
-            (blocksCoveredThisFile, blocksNotCoveredThisFile) = CodeCover.GetFileBlocksCoverageInfo (filePath);
+            (int blocksCoveredThisFile, int blocksNotCoveredThisFile) = CodeCover.GetFileBlocksCoverageInfo (filePath);
             int totalBlocks = blocksCoveredThisFile + blocksNotCoveredThisFile;
             double percent = ((double)blocksCoveredThisFile / totalBlocks) * 100.0;
             percent = Math.Round (percent, 2);
@@ -342,7 +340,7 @@ namespace CoverageAnalyzer {
       /// </summary>
       /// <param name="filePath"></param>
       public void LoadFileIntoDocumentViewer (string filePath) {
-         FlowDocument flowDocument = new FlowDocument {
+         FlowDocument flowDocument = new () {
             FontFamily = new FontFamily ("Consolas"),
             FontSize = 12
          };
@@ -375,7 +373,7 @@ namespace CoverageAnalyzer {
          string lineNumberText = $"{lineNumber:D4}: "; // D4 formats the number to 4 digits (e.g., 0001, 0002)
 
          // Create the paragraph with the line number
-         Paragraph paragraph = new Paragraph () {
+         Paragraph paragraph = new () {
             Margin = new Thickness (0),
             LineHeight = 12
          };
@@ -389,9 +387,9 @@ namespace CoverageAnalyzer {
          if (ranges == null || ranges.Count == 0) paragraph.Inlines.Add (new Run (fileLines[lineNumber - 1]));
          else {
             int prevEndColumn = 0;
-            ranges = ranges.OrderBy (rng => rng.StartColumn).ToList ();
+            ranges = [.. ranges.OrderBy (rng => rng.StartColumn)];
             string afterHighlight;
-            List<string> lineBlock = new List<string> ();
+            List<string> lineBlock = [];
             foreach (Range range in ranges) {
                lineBlock.Clear ();
                int highlightStartColumn = range.StartColumn - 1; // Adjust for 0-based index
@@ -413,8 +411,8 @@ namespace CoverageAnalyzer {
                   var line = lineBlock[ii];
                   // Range with same line, different columns
                   if (lineBlock.Count == 1 && line.Length >= highlightEndColumn && !string.IsNullOrEmpty (line)) {
-                     string beforeHighlight = line.Substring (prevEndColumn, highlightStartColumn - prevEndColumn);
-                     string highlightedText = line.Substring (highlightStartColumn, highlightEndColumn - highlightStartColumn);
+                     string beforeHighlight = line[prevEndColumn..highlightStartColumn];
+                     string highlightedText = line[highlightStartColumn..highlightEndColumn];
                      prevEndColumn = highlightEndColumn;
                      paragraph.Inlines.Add (new Run (beforeHighlight));
                      paragraph.Inlines.Add (new Run (highlightedText) {
@@ -424,9 +422,9 @@ namespace CoverageAnalyzer {
                      string beforeHighlight;
                      if (ii == 0) { // First line
                         if (!string.IsNullOrEmpty (line)) {
-                           beforeHighlight = line.Substring (0, highlightStartColumn);
+                           beforeHighlight = line[..highlightStartColumn];
                            paragraph.Inlines.Add (new Run (beforeHighlight));
-                           string highlightedText = line.Substring (highlightStartColumn);
+                           string highlightedText = line[highlightStartColumn..];
                            paragraph.Inlines.Add (new Run (highlightedText) {
                               Background = range.IsCovered ? coveredBgndBrush : notCoveredBgndBrush
                            });
@@ -439,11 +437,11 @@ namespace CoverageAnalyzer {
                            FontWeight = FontWeights.Bold
                         });
                         if (!string.IsNullOrEmpty (line)) {
-                           string highlightedText = line.Substring (0, highlightEndColumn);
+                           string highlightedText = line[..highlightEndColumn];
                            paragraph.Inlines.Add (new Run (highlightedText) {
                               Background = range.IsCovered ? coveredBgndBrush : notCoveredBgndBrush
                            });
-                           afterHighlight = line.Substring (highlightEndColumn);
+                           afterHighlight = line[highlightEndColumn..];
                            paragraph.Inlines.Add (new Run (afterHighlight));
                         }
                      } else { // Intermediate lines
@@ -462,7 +460,7 @@ namespace CoverageAnalyzer {
             }
             if (lineBlock.Count == 1) {
                // Add remaining text after the last highlight
-               afterHighlight = lineBlock[0].Substring (prevEndColumn);
+               afterHighlight = lineBlock[0][prevEndColumn..];
                paragraph.Inlines.Add (new Run (afterHighlight));
             }
          }

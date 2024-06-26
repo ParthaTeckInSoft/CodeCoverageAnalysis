@@ -7,9 +7,9 @@ namespace CoverageAnalyzer;
 public class CodeCoverage : INotifyPropertyChanged {
    #region Constructor(s)
    public CodeCoverage () {
-      mRangesMap = new ();
-      mSrcFilesMap = new ();
-      mFunctionsMap = new ();
+      mRangesMap = [];
+      mSrcFilesMap = [];
+      mFunctionsMap = [];
    }
    #endregion
 
@@ -89,8 +89,8 @@ public class CodeCoverage : INotifyPropertyChanged {
    /// <param name="blocksCovered">The no. of blocks covered for this function</param>
    /// <param name="blocksNotCovered">The no. of blocks not covered for this function</param>
    public void AddFunction (string filename, int blocksCovered, int blocksNotCovered) {
-      if ( !mFunctionsMap.ContainsKey (filename)) mFunctionsMap[filename] = new ();
-         mFunctionsMap[filename].Add(new Function(blocksCovered, blocksNotCovered));
+      if (!mFunctionsMap.ContainsKey (filename)) mFunctionsMap[filename] = [];
+      mFunctionsMap[filename].Add (new Function (blocksCovered, blocksNotCovered));
    }
 
    /// <summary>
@@ -102,11 +102,9 @@ public class CodeCoverage : INotifyPropertyChanged {
    /// <param name="lineNo">The ranges that cover a specific line number</param>
    /// <returns></returns>
    public List<Range> GetRanges (string fullFilePath, int lineNo) {
-      List<Range> ranges = new List<Range> ();
-      if (mRangesMap.ContainsKey (fullFilePath)) {
-         ranges = mRangesMap[fullFilePath];
-         ranges = ranges.Where (it => it.StartLine == lineNo).ToList ();
-      }
+      List<Range> ranges = [];
+      if (mRangesMap.TryGetValue (fullFilePath, out List<Range>? value)) 
+         ranges = value.Where (it => it.StartLine == lineNo).ToList ();
       return ranges;
    }
 
@@ -145,8 +143,7 @@ public class CodeCoverage : INotifyPropertyChanged {
    /// <returns>The parsed value of the type T</returns>
    /// <exception cref="Exception">Throws exception when encountered one while reading XML attribute</exception>
    static T GetAttributeVal<T> (XmlNode? node, string attributeName, Func<string, T>? parseFunc = null) {
-      var attribute = node?.Attributes?[attributeName];
-      if (attribute == null) throw new Exception ("XML coverage file read failed");
+      var attribute = (node?.Attributes?[attributeName]) ?? throw new Exception ("XML coverage file read failed"); ;
 
       // If parseFunc is not provided, use a default identity function for string type
       parseFunc ??= text => (T)(object)text;
@@ -169,7 +166,7 @@ public class CodeCoverage : INotifyPropertyChanged {
          ClearAll ();
 
          // Read and process the XML file
-         XmlDocument coverageXmlDoc = new XmlDocument ();
+         XmlDocument coverageXmlDoc = [];
          coverageXmlDoc.Load (xmlFilename);
 
          // Get the root element
