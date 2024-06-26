@@ -35,8 +35,8 @@
             </Grid.ColumnDefinitions>
 
             <!-- Left Frame -->
-            <Border Grid.Column="0" BorderBrush="Black" BorderThickness="4 4 0 4">
-                <TreeView Name="treeView" Margin="1" MouseDoubleClick="OnMouseDoubleClickOnTreeViewNode"
+            <Border Grid.Column="0" BorderBrush="SlateGray" BorderThickness="4 4 0 4">
+                <TreeView Name="treeView" Margin="1" SelectedItemChanged="OnTreeViewItemSelected"
                           PreviewMouseRightButtonDown="OnRMBOnTreeviewNode"  Background="LightGray">
                     <TreeView.ContextMenu>
                         <ContextMenu>
@@ -48,12 +48,12 @@
             </Border>
 
             <!-- GridSplitter -->
-            <GridSplitter Grid.Column="1" Width="4" Background="Black"
+            <GridSplitter Grid.Column="1" Width="4" Background="SlateGray"
                           HorizontalAlignment="Center" VerticalAlignment="Stretch" 
                           ShowsPreview="True"/>
 
             <!-- Right Frame -->
-            <Border Grid.Column="2" BorderBrush="Black" BorderThickness="0 4 4 4">
+            <Border Grid.Column="2" BorderBrush="SlateGray" BorderThickness="0 4 4 4">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
@@ -67,10 +67,10 @@
                     <FlowDocumentScrollViewer Grid.Row="0" Grid.Column="0" x:Name="flowDocumentScrollViewer" Margin="5" 
                                               VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                                               VerticalScrollBarVisibility="Auto" 
-                                              Document="{Binding CodeCover.FlowDoc, Mode=OneWay}">
+                                              Document="{Binding FlowDoc, Mode=OneWay}">
                     </FlowDocumentScrollViewer>
 
-                    <Border Grid.Row="1" Background="LightGray" Padding="0" BorderBrush="Black" 
+                    <Border Grid.Row="1" Background="LightGray" Padding="0" BorderBrush="SlateGray" 
                             BorderThickness="0 4 0 0">
                         <!-- Placeholder for additional content or fixed header -->
 
