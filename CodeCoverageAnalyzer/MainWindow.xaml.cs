@@ -357,6 +357,19 @@ namespace CoverageAnalyzer {
       }
 
       /// <summary>
+      /// This is a helper method that returns the index of first non-space-or-tab character
+      /// </summary>
+      /// <param name="input">The input string</param>
+      /// <returns>The index of the first non space/non tab character in a string. 
+      /// It returns -1 if the string null or empty</returns>
+      int IndexOfFirstNonSpaceCharacter (string input) {
+         if (string.IsNullOrEmpty (input))
+            return -1;
+         return input.Select ((c, i) => new { Character = c, Index = i })
+             .FirstOrDefault (x => !char.IsWhiteSpace (x.Character) && x.Character != '\t')?.Index ?? -1;
+      }
+
+      /// <summary>
       /// This method highlights the a specific block in marked by Ranges list. The block can be of size 1 line, 
       /// if the range marks a single line with multiple start or end columns for coverage/non-coverage OR
       /// a block of lines, having more than 1 line, with start column on the first line and end column on the 
@@ -369,9 +382,8 @@ namespace CoverageAnalyzer {
       /// a line or block of lines are either covered or not covered</param>
       void HighlightLine (FlowDocument flowDocument, string[] fileLines, List<Range> ranges,
          ref int lineNumber) {
-         // Format the line number (e.g., 1, 2, 3...)
-         string lineNumberText = $"{lineNumber:D4}: "; // D4 formats the number to 4 digits (e.g., 0001, 0002)
-
+         // Format the line number (e.g., 1, 2, 3...) with padding to left
+         string lineNumberText = $"{lineNumber,4}: ";
          // Create the paragraph with the line number
          Paragraph paragraph = new () {
             Margin = new Thickness (0),
@@ -431,13 +443,14 @@ namespace CoverageAnalyzer {
                         }
                         paragraph.Inlines.Add (new LineBreak ());
                      } else if (ii == lineBlock.Count - 1) { // Last line
-                        lineNumberText = $"{++lineNumber:D4}: ";
+                        lineNumberText = $"{++lineNumber,4}: ";
                         paragraph.Inlines.Add (new Run (lineNumberText) {
                            Foreground = Brushes.Gray,
                            FontWeight = FontWeights.Bold
                         });
                         if (!string.IsNullOrEmpty (line)) {
-                           string highlightedText = line[..highlightEndColumn];
+                           int startIndex = IndexOfFirstNonSpaceCharacter (line);
+                           string highlightedText = line[(startIndex < 0 ? 0 : startIndex)..highlightEndColumn];
                            paragraph.Inlines.Add (new Run (highlightedText) {
                               Background = range.IsCovered ? coveredBgndBrush : notCoveredBgndBrush
                            });
@@ -445,12 +458,16 @@ namespace CoverageAnalyzer {
                            paragraph.Inlines.Add (new Run (afterHighlight));
                         }
                      } else { // Intermediate lines
-                        lineNumberText = $"{++lineNumber:D4}: ";
+                        lineNumberText = $"{++lineNumber,4}: ";
                         paragraph.Inlines.Add (new Run (lineNumberText) {
                            Foreground = Brushes.Gray,
                            FontWeight = FontWeights.Bold
                         });
-                        paragraph.Inlines.Add (new Run (line) {
+                        int startIndex = IndexOfFirstNonSpaceCharacter (line);
+                        beforeHighlight = line[0..(startIndex < 0 ? 0 : startIndex - 1)];
+                        if ( !string.IsNullOrEmpty (beforeHighlight) ) paragraph.Inlines.Add (new Run (beforeHighlight));
+                        string highlightedText = line[(startIndex < 0 ? 0 : startIndex)..];
+                        paragraph.Inlines.Add (new Run (highlightedText) {
                            Background = range.IsCovered ? coveredBgndBrush : notCoveredBgndBrush
                         });
                         paragraph.Inlines.Add (new LineBreak ());

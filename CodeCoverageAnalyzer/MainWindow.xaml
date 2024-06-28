@@ -24,20 +24,23 @@
             </MenuItem>
         </Menu>
 
-        <Grid>
+        <Grid Background="SlateGray">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*"/>
-                <!-- Initial 30% width -->
-                <ColumnDefinition Width="Auto"/>
-                <!-- For the GridSplitter -->
-                <ColumnDefinition Width="7*"/>
-                <!-- Initial 70% width -->
+                <ColumnDefinition Width="270"/>
+                <ColumnDefinition Width="4"/>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="32"/>
+            </Grid.RowDefinitions>
 
             <!-- Left Frame -->
-            <Border Grid.Column="0" BorderBrush="SlateGray" BorderThickness="4 4 0 4">
-                <TreeView Name="treeView" Margin="1" SelectedItemChanged="OnTreeViewItemSelected"
-                          PreviewMouseRightButtonDown="OnRMBOnTreeviewNode"  Background="LightGray">
+            <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" 
+                    BorderThickness="4 4 0 4" >
+                <TreeView Name="treeView" SelectedItemChanged="OnTreeViewItemSelected"
+                          PreviewMouseRightButtonDown="OnRMBOnTreeviewNode"  Background="LightGray" Height="458" VerticalAlignment="Bottom">
                     <TreeView.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="Explode" Click="OnExplodeClick"/>
@@ -48,65 +51,58 @@
             </Border>
 
             <!-- GridSplitter -->
-            <GridSplitter Grid.Column="1" Width="4" Background="SlateGray"
+            <GridSplitter Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" 
+                          Width="4" Background="SlateGray"
                           HorizontalAlignment="Center" VerticalAlignment="Stretch" 
                           ShowsPreview="True"/>
 
             <!-- Right Frame -->
-            <Border Grid.Column="2" BorderBrush="SlateGray" BorderThickness="0 4 4 4">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="40"/>
-                    </Grid.RowDefinitions>
+            <Border Grid.Column="2" Grid.Row="0" Background="LightGray" 
+                     BorderThickness="0 4 4 0" Grid.ColumnSpan="2">
 
-                    <!-- Top of Right Frame -->
-                    <Border Background="LightGray" Padding="5">
-                        <!-- Placeholder for additional content or fixed header -->
-                    </Border>
-                    <FlowDocumentScrollViewer Grid.Row="0" Grid.Column="0" x:Name="flowDocumentScrollViewer" Margin="5" 
-                                              VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                                              VerticalScrollBarVisibility="Auto" 
+                <FlowDocumentScrollViewer x:Name="flowDocumentScrollViewer" 
                                               Document="{Binding FlowDoc, Mode=OneWay}">
-                    </FlowDocumentScrollViewer>
+                </FlowDocumentScrollViewer>
+            </Border>
 
-                    <Border Grid.Row="1" Background="LightGray" Padding="0" BorderBrush="SlateGray" 
-                            BorderThickness="0 4 0 0">
-                        <!-- Placeholder for additional content or fixed header -->
+            <Border Grid.Column="2"  Grid.Row="1" BorderThickness="0 4 4 4" 
+                    Background="LightGray" >
+                <!-- Placeholder for additional content or fixed header -->
 
-                        <!-- Bottom of Right Frame -->
-                        <DockPanel Grid.Row="1" Margin="0" Background="LightGray">
-                            <!-- Recompute Button -->
-                            <Button Content="Recompute" DockPanel.Dock="Left" Click="OnRecomputeClick" Height="25" Width="63">
-                                <Button.Style>
-                                    <Style TargetType="Button">
+                <!-- Bottom of Right Frame -->
+                <DockPanel Background="LightGray">
+                    <!-- Recompute Button -->
+                    <Button Content="Recompute" DockPanel.Dock="Left" Click="OnRecomputeClick" 
+                                    BorderBrush="{x:Null}">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="Black" ShadowDepth="5" 
+                                                              Opacity="0" />
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsPressed" Value="True">
                                         <Setter Property="Effect">
                                             <Setter.Value>
                                                 <DropShadowEffect Color="Black" ShadowDepth="5" 
-                                                              Opacity="0" />
+                                                                      Opacity="0.5" />
                                             </Setter.Value>
                                         </Setter>
-                                        <Style.Triggers>
-                                            <Trigger Property="IsPressed" Value="True">
-                                                <Setter Property="Effect">
-                                                    <Setter.Value>
-                                                        <DropShadowEffect Color="Black" ShadowDepth="5" 
-                                                                      Opacity="0.5" />
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Button.Style>
-                            </Button>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
 
-                            <!-- Non-editable TextBox -->
-                            <TextBox Margin="4" IsReadOnly="True"
-                                 Text="{Binding LoadedSrcFullFilePath, Mode=OneWay}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Height="16"/>
-                        </DockPanel>
-                    </Border>
-                </Grid>
+                </DockPanel>
             </Border>
+            
+            <!-- Non-editable TextBox -->
+            <TextBox Grid.Column="3" Grid.Row="1" IsReadOnly="True" BorderThickness="0 4 4 4" 
+                                 Text="{Binding LoadedSrcFullFilePath, Mode=OneWay}" BorderBrush="{x:Null}" 
+                     />
         </Grid>
     </DockPanel>
 </Window>
