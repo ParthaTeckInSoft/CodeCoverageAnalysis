@@ -201,7 +201,7 @@ public partial class MainViewModel : INotifyPropertyChanged {
    /// and 
    /// </summary>
    /// <param name="eventArgs"> The object that the RMB mouse button select sends</param>
-   private void OnTreeViewItemSelected (RoutedPropertyChangedEventArgs<object> eventArgs) {
+   void OnTreeViewItemSelected (RoutedPropertyChangedEventArgs<object> eventArgs) {
       if (eventArgs.OriginalSource is DependencyObject) {
          // Retrieve the selected treeview item node object
          var item = (TreeViewItem)eventArgs.NewValue;
@@ -229,19 +229,6 @@ public partial class MainViewModel : INotifyPropertyChanged {
              blocksCoveredThisFile, totalBlocks,
              totalBlocks > 0 ? percent : 0.0); ;
          LoadedSrcFullFilePath = fileCvrgInfo;
-      }
-   }
-   private void OnRMBOnTreeviewNode (MouseButtonEventArgs e) {
-      if (e.OriginalSource is DependencyObject originalSource) {
-
-         // Retrieve the selected treeview item node object
-         var treeViewItem = FindAncestor<TreeViewItem> (originalSource);
-         if (treeViewItem != null) {
-
-            // Mark the treeViewItem node as selected
-            treeViewItem.IsSelected = true;
-            e.Handled = true;
-         }
       }
    }
    #endregion
@@ -383,10 +370,12 @@ public partial class MainViewModel : INotifyPropertyChanged {
    /// </summary>
    /// <param name="sender">The source of the event, typically the TreeView control</param>
    /// <param name="e">The event data containing information about the mouse button event</param>
-   void OnRMBOnTreeviewNode (object sender, MouseButtonEventArgs e) {
+   void OnRMBOnTreeviewNode (MouseButtonEventArgs e) {
       if (e.OriginalSource is DependencyObject originalSource) {
+         // Retrieve the selected treeview item node object
          var treeViewItem = FindAncestor<TreeViewItem> (originalSource);
          if (treeViewItem != null) {
+            // Mark the treeViewItem node as selected
             treeViewItem.IsSelected = true;
             e.Handled = true;
          }
