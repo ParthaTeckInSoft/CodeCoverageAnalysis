@@ -34,7 +34,6 @@ public class CodeCoverage : INotifyPropertyChanged {
    }
 
    Dictionary<int, string> mSrcFilesMap;
-
    /// <summary>
    /// Returns the list of source files mentioned in the coverage output xml document
    /// </summary>
@@ -81,7 +80,6 @@ public class CodeCoverage : INotifyPropertyChanged {
    }
 
    Dictionary<string, List<Function>> mFunctionsMap;
-
    /// <summary>
    /// THis method Adds a new Function Info to add it to the dictionary mFunctionsMap
    /// </summary>

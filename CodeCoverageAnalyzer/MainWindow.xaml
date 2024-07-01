@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:local="clr-namespace:CoverageAnalyzer" d:DataContext="{d:DesignInstance Type=local:CodeCoverage}"
         mc:Ignorable="d"
         Title="{Binding AppTitle}"
@@ -19,8 +20,8 @@
         <!-- Menu -->
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
-                <MenuItem Header="Open" Click="OnFileOpenClick"/>
-                <MenuItem Header="Close" Click="OnFileCloseClick"/>
+                <MenuItem Header="Open" Command="{Binding OpenFile}"/>
+                <MenuItem Header="Close" Command="{Binding CloseFile}"/>
             </MenuItem>
         </Menu>
 
@@ -39,12 +40,21 @@
             <!-- Left Frame -->
             <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" 
                     BorderThickness="4 4 0 4" >
-                <TreeView Name="treeView" SelectedItemChanged="OnTreeViewItemSelected"
-                          PreviewMouseRightButtonDown="OnRMBOnTreeviewNode"  Background="LightGray" Height="458" VerticalAlignment="Bottom">
+                <TreeView Name="treeView" 
+                          Background="LightGray" Height="462" VerticalAlignment="Top" Margin="0,0,0,0">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="PreviewMouseRightButtonDown">
+                            <i:InvokeCommandAction Command="{Binding RMBOnTreeviewNode}" PassEventArgsToCommand="True" />
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="SelectedItemChanged">
+                            <i:InvokeCommandAction Command="{Binding LoadSourceFileInViewer}" 
+                                   PassEventArgsToCommand="True" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                     <TreeView.ContextMenu>
                         <ContextMenu>
-                            <MenuItem Header="Explode" Click="OnExplodeClick"/>
-                            <MenuItem Header="Collapse" Click="OnCollapseClick"/>
+                            <MenuItem Header="Explode" Command="{Binding ExplodeTreeView}"/>
+                            <MenuItem Header="Collapse" Command="{Binding CollapseTreeView}"/>
                         </ContextMenu>
                     </TreeView.ContextMenu>
                 </TreeView>
@@ -67,27 +77,23 @@
 
             <Border Grid.Column="2"  Grid.Row="1" BorderThickness="0 4 4 4" 
                     Background="LightGray" >
-                <!-- Placeholder for additional content or fixed header -->
-
+                
                 <!-- Bottom of Right Frame -->
                 <DockPanel Background="LightGray">
                     <!-- Recompute Button -->
-                    <Button Content="Recompute" DockPanel.Dock="Left" Click="OnRecomputeClick" 
-                                    BorderBrush="{x:Null}">
+                    <Button Content="Recompute" DockPanel.Dock="Left" Command="{Binding Recompute}" BorderBrush="{x:Null}">
                         <Button.Style>
                             <Style TargetType="Button">
                                 <Setter Property="Effect">
                                     <Setter.Value>
-                                        <DropShadowEffect Color="Black" ShadowDepth="5" 
-                                                              Opacity="0" />
+                                        <DropShadowEffect Color="Black" ShadowDepth="5" Opacity="0" />
                                     </Setter.Value>
                                 </Setter>
                                 <Style.Triggers>
                                     <Trigger Property="IsPressed" Value="True">
                                         <Setter Property="Effect">
                                             <Setter.Value>
-                                                <DropShadowEffect Color="Black" ShadowDepth="5" 
-                                                                      Opacity="0.5" />
+                                                <DropShadowEffect Color="Black" ShadowDepth="5" Opacity="0.5" />
                                             </Setter.Value>
                                         </Setter>
                                     </Trigger>
@@ -95,14 +101,12 @@
                             </Style>
                         </Button.Style>
                     </Button>
-
                 </DockPanel>
             </Border>
-            
+
             <!-- Non-editable TextBox -->
             <TextBox Grid.Column="3" Grid.Row="1" IsReadOnly="True" BorderThickness="0 4 4 4" 
-                                 Text="{Binding LoadedSrcFullFilePath, Mode=OneWay}" BorderBrush="{x:Null}" 
-                     />
+                                 Text="{Binding LoadedSrcFullFilePath, Mode=OneWay}" BorderBrush="SlateGray" />
         </Grid>
     </DockPanel>
 </Window>
