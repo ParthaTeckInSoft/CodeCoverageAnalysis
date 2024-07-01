@@ -200,54 +200,7 @@ public partial class MainViewModel : INotifyPropertyChanged {
    /// Scroll Viewer. The command is an instance of BindCommand, which uses TreeViewEventArgs
    /// and 
    /// </summary>
-   /// <param name="parameter"></param>
-   //void OnTreeViewItemSelected (object parameter) {
-   //   if (parameter is RoutedPropertyChangedEventArgs<object> eventArgs) {
-
-   //      if (eventArgs.OriginalSource is DependencyObject) {
-   //         // Retrieve the selected treeview item node object
-   //         var item = (TreeViewItem)eventArgs.NewValue;
-
-   //         // If tree view item is null, return.
-   //         if (item == null) return;
-   //         bool isFile = File.Exists (item.Tag as string);
-
-   //         // If the treeview item does not contain the file path associated with it, return
-   //         if (!isFile) return;
-
-   //         // Get the associated file path (from Tag)
-   //         string filePath = item.Tag as string ?? "";
-
-   //         // If file path exists, load the file into FlowDocumentScrollViewer
-   //         if (!string.IsNullOrEmpty (filePath) && File.Exists (filePath))
-   //            LoadFileIntoDocumentViewer (filePath);
-
-   //         // Get the blocks covered and not covered to display them
-   //         (int blocksCoveredThisFile, int blocksNotCoveredThisFile) = CodeCover.GetFileBlocksCoverageInfo (filePath);
-   //         int totalBlocks = blocksCoveredThisFile + blocksNotCoveredThisFile;
-   //         double percent = (double)blocksCoveredThisFile / totalBlocks * 100.0;
-   //         percent = Math.Round (percent, 2);
-   //         string fileCvrgInfo = string.Format ("{0} : {1} / {2} : blocks  {3} %", filePath,
-   //             blocksCoveredThisFile, totalBlocks,
-   //             totalBlocks > 0 ? percent : 0.0); ;
-   //         LoadedSrcFullFilePath = fileCvrgInfo;
-   //      }
-   //   }
-   //}
-   private void OnRMBOnTreeviewNode (MouseButtonEventArgs e) {
-      if (e.OriginalSource is DependencyObject originalSource) {
-
-         // Retrieve the selected treeview item node object
-         var treeViewItem = FindAncestor<TreeViewItem> (originalSource);
-         if (treeViewItem != null) {
-
-            // Mark the treeViewItem node as selected
-            treeViewItem.IsSelected = true;
-            e.Handled = true;
-         }
-      }
-   }
-
+   /// <param name="eventArgs"> The object that the RMB mouse button select sends</param>
    private void OnTreeViewItemSelected (RoutedPropertyChangedEventArgs<object> eventArgs) {
       if (eventArgs.OriginalSource is DependencyObject) {
          // Retrieve the selected treeview item node object
@@ -278,48 +231,19 @@ public partial class MainViewModel : INotifyPropertyChanged {
          LoadedSrcFullFilePath = fileCvrgInfo;
       }
    }
+   private void OnRMBOnTreeviewNode (MouseButtonEventArgs e) {
+      if (e.OriginalSource is DependencyObject originalSource) {
 
-   //T FindAncestor<T> (DependencyObject current) where T : DependencyObject {
-   //   while (current != null) {
-   //      if (current is T ancestor) return ancestor;
-   //      current = VisualTreeHelper.GetParent (current);
-   //   }
-   //   return null;
-   //}
-   //private void OnTreeViewItemSelected (object parameter) {
-   //   if (parameter is TreeViewEventArgsWrapper args) {
-   //      var sender = args.Sender;
-   //      var e = args.EventArgs;
+         // Retrieve the selected treeview item node object
+         var treeViewItem = FindAncestor<TreeViewItem> (originalSource);
+         if (treeViewItem != null) {
 
-   //      if (e.OriginalSource is DependencyObject) {
-   //         var item = (TreeViewItem)e.NewValue;
-
-   //         // If tree view item is null, return.
-   //         if (item == null) return;
-   //         bool isFile = File.Exists (item.Tag as string);
-
-   //         // If the treeview item does not contain the file path associated with it, return
-   //         if (!isFile) return;
-
-   //         // Get the associated file path (from Tag)
-   //         string filePath = item.Tag as string ?? "";
-
-   //         // If file path exists, load the file into FlowDocumentScrollViewer
-   //         if (!string.IsNullOrEmpty (filePath) && File.Exists (filePath))
-   //            LoadFileIntoDocumentViewer (filePath);
-
-   //         // Get the blocks covered and not covered to display them
-   //         (int blocksCoveredThisFile, int blocksNotCoveredThisFile) = CodeCover.GetFileBlocksCoverageInfo (filePath);
-   //         int totalBlocks = blocksCoveredThisFile + blocksNotCoveredThisFile;
-   //         double percent = ((double)blocksCoveredThisFile / totalBlocks) * 100.0;
-   //         percent = Math.Round (percent, 2);
-   //         string fileCvrgInfo = string.Format ("{0} : {1} / {2} : blocks  {3} %", filePath,
-   //            blocksCoveredThisFile, totalBlocks,
-   //            (totalBlocks) > 0 ? percent : 0.0);
-   //         LoadedSrcFullFilePath = fileCvrgInfo;
-   //      }
-   //   }
-   //}
+            // Mark the treeViewItem node as selected
+            treeViewItem.IsSelected = true;
+            e.Handled = true;
+         }
+      }
+   }
    #endregion
 
    #region Clearances
@@ -414,7 +338,8 @@ public partial class MainViewModel : INotifyPropertyChanged {
    /// <param name="treeViewItem"></param>
    void CollapseTree (TreeViewItem treeViewItem) {
       treeViewItem.IsExpanded = false;
-      foreach (var item in treeViewItem.Items)          if (item is TreeViewItem childItem) CollapseTree (childItem);
+      foreach (var item in treeViewItem.Items)
+         if (item is TreeViewItem childItem) CollapseTree (childItem);
    }
 
    /// <summary>
@@ -424,7 +349,8 @@ public partial class MainViewModel : INotifyPropertyChanged {
    void ExplodeTree (TreeViewItem? treeViewItem) {
       if (treeViewItem == null) return;
       treeViewItem.IsExpanded = true;
-      foreach (var item in treeViewItem.Items)          if (item is TreeViewItem childItem) ExplodeTree (childItem);
+      foreach (var item in treeViewItem.Items)
+         if (item is TreeViewItem childItem) ExplodeTree (childItem);
    }
 
    /// <summary>
